@@ -1,5 +1,5 @@
 import {Inject, Directive} from "ngts/ngts";
-import {NgtsLayoutService} from "ngts-directives/services/layout.data.service";
+import {NgtsLayoutService} from "./services/layout.data.service";
 
 @Directive({
     module: "ngtsModule",
