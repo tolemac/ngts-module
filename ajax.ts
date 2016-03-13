@@ -2,7 +2,7 @@ import {Inject, Directive} from "ngts/ngts";
 import {AbsoluteUrl} from "./url.helper";
 
 @Directive({
-    module: "ngtsModule",    
+    module: "ngtsModule",
     restrict: "E",
     bindToController: true,
     scope: {
@@ -15,8 +15,9 @@ import {AbsoluteUrl} from "./url.helper";
     priority: 20000
 })
 export class NgtsAjax {
-    auto = false; // Si es false se ejecuta solo cuando se llama explicitamente a "run()", si no lo hará en cuanto path tenga valores correctos.
-    as: any; 
+    // Si es false se ejecuta solo cuando se llama explicitamente a "run()", si no lo hará en cuanto path tenga valores correctos.
+    auto = false;
+    as: any;
     url: string;
     pathAttr: string;
     parentScope: any;
@@ -31,10 +32,10 @@ export class NgtsAjax {
     model: any;
     onFail: () => void;
     onSuccess: () => void;
-    
+
     paged = false;
     incrementalModel = false;
-    hasMore : boolean;
+    hasMore: boolean;
 
     constructor( @Inject("$scope") $scope, @Inject("$attrs") private $attrs,
         @Inject("$http") private $http: angular.IHttpService, @Inject("$location") private $location,
@@ -44,22 +45,24 @@ export class NgtsAjax {
         this.auto = angular.isDefined($attrs.auto) && $attrs.auto !== false;
         this.paged = angular.isDefined($attrs.paged) && $attrs.paged !== false;
         this.incrementalModel = angular.isDefined($attrs.incremental) && $attrs.incremental !== false;
-        if (this.incrementalModel)
+        if (this.incrementalModel) {
             this.paged = true;
+        }
         this.absoluteUrl = angular.isDefined($attrs.absPath) && $attrs.absPath !== false;
         this.as = this;
         this.parentScope = $scope.$parent;
 
         this.observePath();
 
-        if (this.paged)
+        if (this.paged) {
             this.params = { queryInfo: { Pagina: 0, RegistrosPorPagina: 10 } };
+        }
     }
 
     private observePath() {
-        if (!this.url)
+        if (!this.url) {
             this.url = this.$location.path();
-        else {
+        } else {
             const pathVariables = this.pathVariables = this.pathAttr.match(/{{[\w.\s|:$']+}}/g) || [];
             if (pathVariables) {
                 for (let i in pathVariables) {
@@ -72,8 +75,9 @@ export class NgtsAjax {
         }
 
         this.$attrs.$observe("path", () => {
-            if (this.auto && this.pathVariablesHaveValues())
+            if (this.auto && this.pathVariablesHaveValues()){
                 this.run();
+            }
         });
     }
 
@@ -93,13 +97,15 @@ export class NgtsAjax {
 
     private assignModel(data) {
         if (this.incrementalModel && angular.isArray(data)) {
-            if (!this.model)
+            if (!this.model) {
                 this.model = [];
+            }
             this.model = this.model.concat(data);
             this.hasMore = data.length === this.params.pageSize;
         } else {
-            if (this.model)
+            if (this.model) {
                 delete this.model;
+            }
             this.model = data;
         }
     }
@@ -113,11 +119,11 @@ export class NgtsAjax {
         this.fail = false;
 
         const url = this.absoluteUrl ? this.url : AbsoluteUrl(this.url);
-        if (this.httpVerb === "get")
+        if (this.httpVerb === "get") {
             promise = this.$http.get<any>(url);
-        else if (this.httpVerb === "post")
+        } else if (this.httpVerb === "post") {
             promise = this.$http.post<any>(url, params);
-        else {
+        } else {
             this.working = false;
             alert("AjaxHttp: Méthod " + this.httpVerb + " not implemented.");
             return undefined;
